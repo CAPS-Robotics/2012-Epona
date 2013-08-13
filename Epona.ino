@@ -1,35 +1,33 @@
 #include <SPI.h>
 #include <Ethernet.h>
+#include <EEPROM.h>
 #include <RobotOpen.h>
 
-USBJoystick usb1('0');
-
-//ToDo: shooter spinup, index motor, ball feed motor
-// all will be momentary driven
+/* I/O Setup */
+ROJoystick usb1(1);         // Joystick #1
+ROPWM leftDrive(0);
+ROPWM rightDrive(1);
 
 void setup()
 {
-  RobotOpen.begin();
+  RobotOpen.begin(&enabled, &disabled, &timedtasks);
 }
-
 
 void enabled() {
-  RobotOpen.setPWM(SIDECAR_PWM1, usb1.makePWM(ANALOG_LEFTY, INVERT));
-  RobotOpen.setPWM(SIDECAR_PWM2, usb1.makePWM(ANALOG_RIGHTY, NORMAL));
+  leftDrive.write(usb1.leftY());
+  rightDrive.write(usb1.rightY());
 }
-
 
 void disabled() {
 }
+
+
 void timedtasks() {
 }
 
+
+// !!! DO NOT MODIFY !!!
 void loop() {
-  RobotOpen.pollDS();
-  if (RobotOpen.enabled())
-    enabled();
-  else
-    disabled();
-  timedtasks();
-  RobotOpen.outgoingDS();
+  RobotOpen.syncDS();
 }
+
